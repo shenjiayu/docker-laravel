@@ -1,4 +1,5 @@
 # docker-laravel
+This is an experimental dev/test/prod environment for laravel.
 
 # How to use
 1. `git clone` this project and put into your laravel project
