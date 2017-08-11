@@ -1,0 +1,60 @@
+version: "2"
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: app.docker
+        volumes:
+            - ../:/var/www
+    
+    web:
+        build:
+            context: .
+            dockerfile: web.docker
+        volumes_from:
+            - app
+        ports:
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - app
+
+    session:
+        build:
+            context: .
+            dockerfile: session.docker
+        ports:
+            - "11211:11211"
+        depends_on:
+            - app
+    
+    database:
+        user: "1000:50"
+        build:
+            context: .
+            dockerfile: database.docker
+        environment:
+            - MYSQL_DATABASE=DB_NAME
+            - MYSQL_USER=DB_USER
+            - MYSQL_PASSWORD=DB_PASSWORD
+            - MYSQL_ROOT_PASSWORD=DB_ROOT_PASSWORD
+        volumes:
+            - ../data/db:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        depends_on:
+            - app
+
+    cache:
+        image: redis:latest
+        ports:
+            - "6379:6379"
+        depends_on:
+            - app
+
+volumes:
+    database:
+        driver: "local"
+    cache:
+        driver: "local"
